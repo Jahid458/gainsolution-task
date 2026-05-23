@@ -3,7 +3,7 @@ import { MoreVertical, Check, X, Pencil, Trash2, Download } from "lucide-react";
 import { TableData } from "../DataList/TableData";
 import TableDropDown from "./TableDropDown";
 
-const colour = {
+const departmentColors = {
   Design: "bg-[#F0FDF4] text-[#16A34A]",
   Development: "bg-[#F0F6FD] text-[#1653A3]",
   Product: "bg-[#FDF3F0] text-[#A36616]",
@@ -12,48 +12,82 @@ const colour = {
 
 const Table = () => {
   const [tableData, setTableData] = useState(TableData);
-
-  const [filters, setFilters] = useState({
-    search: "",
-    department: "",
-    status: "",
-  });
-
+  const [filters, setFilters] = useState({ search: "", department: "", status: "" });
   const [openMenuIndex, setOpenMenuIndex] = useState(null);
 
-  const filteredData = useMemo(() => {
-    return tableData.filter((item) => {
-      const searchMatch = item.name
-        .toLowerCase()
-        .includes(filters.search.toLowerCase());
 
-      const departmentMatch = filters.department
-        ? item.department === filters.department
-        : true;
 
-      const statusMatch = filters.status
-        ? item.status === filters.status.toLowerCase()
-        : true;
-
-      return searchMatch && departmentMatch && statusMatch;
-    });
-  }, [tableData, filters]);
-
-  // 👉 INDEX BASED UPDATE (NO ID)
-  const updateStatus = (index, status) => {
+  const updateStatus = (index, newStatus) => {
     setTableData((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, status } : item)),
+      prev.map((item, i) => (i === index ? { ...item, status: newStatus } : item))
     );
   };
 
   const undoStatus = (index) => {
     setTableData((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, status: "none" } : item)),
+      prev.map((item, i) => (i === index ? { ...item, status: "none" } : item))
     );
   };
 
   const deleteRow = (index) => {
     setTableData((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const toggleMenu = (index) => {
+    setOpenMenuIndex((prev) => (prev === index ? null : index));
+  };
+
+  const renderActionButtons = (item, index) => {
+    if (item.status === "approved") {
+      return (
+        <div className="flex items-center gap-2">
+          <button className="flex items-center gap-1 bg-[#E8F8EC] text-[#089624] border border-[#089624] px-3 py-1.5 rounded-xl text-xs">
+            <Check size={14} />
+            Approved
+          </button>
+          <button
+            onClick={() => undoStatus(index)}
+            className="text-xs border px-2 py-1 rounded hover:bg-gray-50"
+          >
+            Undo
+          </button>
+        </div>
+      );
+    }
+
+    if (item.status === "rejected") {
+      return (
+        <div className="flex items-center gap-2">
+          <button className="flex items-center gap-1 bg-[#FFF1EF] text-[#E02600] border border-[#E02600] px-3 py-1.5 rounded-xl text-xs">
+            <X size={14} />
+            Rejected
+          </button>
+          <button
+            onClick={() => undoStatus(index)}
+            className="text-xs border px-2 py-1 rounded hover:bg-gray-50"
+          >
+            Undo
+          </button>
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => updateStatus(index, "rejected")}
+          className="text-red-500 text-xs font-medium px-2 py-1 hover:bg-red-50 rounded"
+        >
+          Reject
+        </button>
+        <button
+          onClick={() => updateStatus(index, "approved")}
+          className="bg-[#089624] hover:bg-[#06751c] text-white px-3 py-1.5 rounded-xl text-xs"
+        >
+          Approve
+        </button>
+      </div>
+    );
   };
 
   return (
@@ -64,6 +98,7 @@ const Table = () => {
         <table className="w-full min-w-275 border-collapse">
           <thead>
             <tr className="bg-[#F4F6F8] text-[#464255] text-sm font-semibold">
+              <th className="p-4 text-left">Employee ID</th>
               <th className="p-4 text-left">Employee</th>
               <th className="p-4 text-left">Duration</th>
               <th className="p-4 text-left">Time</th>
@@ -81,19 +116,14 @@ const Table = () => {
                 key={index}
                 className="border-b border-[#ECEEF2] hover:bg-[#FAFAFA] text-sm text-[#464255]"
               >
+                <td className="p-4 ">{item.id}</td>
                 <td className="p-4 font-medium">{item.name}</td>
                 <td className="p-4">{item.duration}</td>
-                <td className="p-4">
-                  {item.start} - {item.end}
-                </td>
+                <td className="p-4">{item.start} - {item.end}</td>
                 <td className="p-4">{item.due}</td>
 
                 <td className="p-4">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium inline-flex items-center gap-2 ${
-                      colour[item.department]
-                    }`}
-                  >
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium inline-flex items-center gap-2 ${departmentColors[item.department]}`}>
                     <span className="w-1.5 h-1.5 rounded-full bg-current" />
                     {item.department}
                   </span>
@@ -104,56 +134,10 @@ const Table = () => {
 
                 <td className="p-4 relative">
                   <div className="flex items-center justify-end gap-3">
-                    {item.status === "approved" ? (
-                      <div className="flex items-center gap-2">
-                        <button className="flex items-center gap-1 bg-[#E8F8EC] text-[#089624] border border-[#089624] px-3 py-1.5 rounded-xl text-xs">
-                          <Check size={14} />
-                          Approved
-                        </button>
-
-                        <button
-                          onClick={() => undoStatus(index)}
-                          className="text-xs border px-2 py-1 rounded hover:bg-gray-50"
-                        >
-                          Undo
-                        </button>
-                      </div>
-                    ) : item.status === "rejected" ? (
-                      <div className="flex items-center gap-2">
-                        <button className="flex items-center gap-1 bg-[#FFF1EF] text-[#E02600] border border-[#E02600] px-3 py-1.5 rounded-xl text-xs">
-                          <X size={14} />
-                          Rejected
-                        </button>
-
-                        <button
-                          onClick={() => undoStatus(index)}
-                          className="text-xs border px-2 py-1 rounded hover:bg-gray-50"
-                        >
-                          Undo
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => updateStatus(index, "rejected")}
-                          className="text-red-500 text-xs font-medium px-2 py-1 hover:bg-red-50 rounded"
-                        >
-                          Reject
-                        </button>
-
-                        <button
-                          onClick={() => updateStatus(index, "approved")}
-                          className="bg-[#089624] hover:bg-[#06751c] text-white px-3 py-1.5 rounded-xl text-xs"
-                        >
-                          Approve
-                        </button>
-                      </div>
-                    )}
+                    {renderActionButtons(item, index)}
 
                     <button
-                      onClick={() =>
-                        setOpenMenuIndex(openMenuIndex === index ? null : index)
-                      }
+                      onClick={() => toggleMenu(index)}
                       className="p-2 border border-[#E5E7EB] rounded-lg hover:bg-gray-50"
                     >
                       <MoreVertical size={16} />
@@ -166,12 +150,10 @@ const Table = () => {
                         <Pencil size={14} />
                         Edit
                       </button>
-
                       <button className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50 w-full text-sm">
                         <Download size={14} />
                         Export
                       </button>
-
                       <button
                         onClick={() => deleteRow(index)}
                         className="flex items-center gap-2 px-4 py-2 hover:bg-red-50 text-red-500 w-full text-sm"
