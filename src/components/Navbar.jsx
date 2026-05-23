@@ -18,7 +18,7 @@ const Navbar = () => {
   ];
 
   const userData = {
-    name: "Sadik Hasan",
+    name: "Sadik Hasan ",
     date: "Friday, 29 September",
     image: dp,
   };
@@ -36,9 +36,9 @@ const Navbar = () => {
     <nav className="relative w-full bg-white border-b border-gray-100 shadow-sm px-4 md:px-6 xl:px-8 py-3 z-50">
       <div className="max-w-400 mx-auto flex items-center justify-between">
 
-        <div className="flex justify-center items-center ">
+        <div className="flex lg:w-[20%] justify-center items-center ">
           <h1 className="font-bold text-xl">PLUT</h1>
-          <img src={logo} alt="logo" className="h-6" />
+          <img src={logo} alt="logo" className="h-7" />
         </div>
 
         <div className="hidden lg:flex items-center gap-8">
@@ -76,7 +76,7 @@ const Navbar = () => {
             <img
               src={userData.image}
               alt="profile"
-              className="w-10 h-10 rounded-full border object-cover"
+        
             />
           </div>
         </div>
@@ -149,7 +149,7 @@ const Navbar = () => {
         <div className="flex items-center gap-3 p-4">
           <img
             src={userData.image}
-            className="w-12 h-12 rounded-full border object-cover"
+            className="h-12 w-12 rounded-full border border-[#CDCFD2] object-cover"
           />
           <div>
             <p className="font-semibold">{userData.name}</p>
