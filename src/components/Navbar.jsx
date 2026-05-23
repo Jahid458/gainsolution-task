@@ -49,7 +49,7 @@ const Navbar = () => {
               onClick={() => setActive(item.title)}
               className={`text-[16px] font-medium transition ${
                 active === item.title
-                  ? "text-primary border-b-2 border-primary pb-1"
+                  ? "text-primary border-primary pb-1"
                   : "text-[#5A5B5F] hover:text-primary"
               }`}
             >
