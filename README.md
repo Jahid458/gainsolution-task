@@ -30,4 +30,9 @@ A modern and responsive Employee Management System built using React, Tailwind C
 
 ---
 
+## Live Link and git Link 
+
+- Live Link --> https://gainsolution-task.vercel.app
+- Github Link --> https://github.com/Jahid458/gainsolution-task
+
 
