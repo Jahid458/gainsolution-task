@@ -13,9 +13,7 @@ const CustomDropdown = ({ options = [], placeholder, onSelect }) => {
         setOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleOutside);
-
     return () => document.removeEventListener("mousedown", handleOutside);
   }, []);
 
@@ -31,8 +29,9 @@ const CustomDropdown = ({ options = [], placeholder, onSelect }) => {
         onClick={() => setOpen(!open)}
         className="w-full h-12 border border-[#DBDFE2] rounded-xl px-4 flex items-center justify-between text-sm bg-white"
       >
-        <span>{selected || placeholder}</span>
-
+        <span className={selected ? "text-[#0A0A0A]" : "text-gray-400"}>
+          {selected || placeholder}
+        </span>
         <ChevronDown
           size={16}
           className={`transition ${open ? "rotate-180" : ""}`}
@@ -45,7 +44,9 @@ const CustomDropdown = ({ options = [], placeholder, onSelect }) => {
             <button
               key={i}
               onClick={() => handleSelect(item)}
-              className="w-full text-left px-4 py-3 hover:bg-gray-50 text-sm"
+              className={`w-full text-left px-4 py-3 hover:bg-gray-50 text-sm ${
+                selected === item ? "bg-blue-50 text-blue-600" : ""
+              }`}
             >
               {item}
             </button>
