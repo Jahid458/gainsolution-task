@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { MoreVertical, Check, X, Pencil, Trash2, Download } from "lucide-react";
 import { TableData } from "../DataList/TableData";
 import TableDropDown from "./TableDropDown";
@@ -14,6 +14,21 @@ const Table = () => {
   const [tableData, setTableData] = useState(TableData);
   const [filters, setFilters] = useState({ search: "", department: "", status: "" });
   const [openMenuIndex, setOpenMenuIndex] = useState(null);
+
+
+  const filteredData = tableData.filter((item) => {
+  const matchesSearch = item.name.toLowerCase().includes(filters.search.toLowerCase());
+
+  const matchesDepartment = filters.department ? 
+            item.department === filters.department : true;
+
+
+  const matchesStatus = filters.status ? 
+                item.status === filters.status.toLowerCase() 
+                : true;
+
+  return matchesSearch && matchesDepartment && matchesStatus;
+});
 
 
 

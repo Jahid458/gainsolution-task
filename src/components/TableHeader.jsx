@@ -43,7 +43,7 @@ const TableHeader = () => {
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-white/40">
-          <div className="bg-white shadow-xl rounded-lg max-w-[882px] w-full">
+          <div className="bg-white shadow-xl rounded-lg max-w-220.5 w-full">
             <AddEmployeeModal setIsModalOpen={setIsModalOpen} />
           </div>
         </div>
