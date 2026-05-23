@@ -12,19 +12,20 @@ const colour = {
 
 const Table = () => {
   const [tableData, setTableData] = useState(TableData);
+
   const [filters, setFilters] = useState({
     search: "",
     department: "",
     status: "",
   });
 
-  const [openMenu, setOpenMenu] = useState(null);
+  const [openMenuIndex, setOpenMenuIndex] = useState(null);
 
   const filteredData = useMemo(() => {
     return tableData.filter((item) => {
-      const searchMatch =
-        item.name.toLowerCase().includes(filters.search.toLowerCase()) ||
-        item.id.toLowerCase().includes(filters.search.toLowerCase());
+      const searchMatch = item.name
+        .toLowerCase()
+        .includes(filters.search.toLowerCase());
 
       const departmentMatch = filters.department
         ? item.department === filters.department
@@ -38,16 +39,21 @@ const Table = () => {
     });
   }, [tableData, filters]);
 
-  const updateStatus = (id, status) => {
+  // 👉 INDEX BASED UPDATE (NO ID)
+  const updateStatus = (index, status) => {
     setTableData((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, status } : item
-      )
+      prev.map((item, i) => (i === index ? { ...item, status } : item)),
     );
   };
 
-  const deleteRow = (id) => {
-    setTableData((prev) => prev.filter((item) => item.id !== id));
+  const undoStatus = (index) => {
+    setTableData((prev) =>
+      prev.map((item, i) => (i === index ? { ...item, status: "none" } : item)),
+    );
+  };
+
+  const deleteRow = (index) => {
+    setTableData((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -55,10 +61,9 @@ const Table = () => {
       <TableDropDown filters={filters} setFilters={setFilters} />
 
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[1100px] border-collapse">
+        <table className="w-full min-w-275 border-collapse">
           <thead>
             <tr className="bg-[#F4F6F8] text-[#464255] text-sm font-semibold">
-              <th className="p-4 text-left">ID</th>
               <th className="p-4 text-left">Employee</th>
               <th className="p-4 text-left">Duration</th>
               <th className="p-4 text-left">Time</th>
@@ -66,17 +71,16 @@ const Table = () => {
               <th className="p-4 text-left">Department</th>
               <th className="p-4 text-left">Project</th>
               <th className="p-4 text-left">Notes</th>
-              <th className="p-4 text-left w-[220px]">Action</th>
+              <th className="p-4 text-left w-55">Action</th>
             </tr>
           </thead>
 
           <tbody>
-            {filteredData.map((item) => (
+            {filteredData.map((item, index) => (
               <tr
-                key={item.id}
+                key={index}
                 className="border-b border-[#ECEEF2] hover:bg-[#FAFAFA] text-sm text-[#464255]"
               >
-                <td className="p-4">{item.id}</td>
                 <td className="p-4 font-medium">{item.name}</td>
                 <td className="p-4">{item.duration}</td>
                 <td className="p-4">
@@ -96,35 +100,49 @@ const Table = () => {
                 </td>
 
                 <td className="p-4">{item.project}</td>
-
-                <td className="p-4 max-w-55 truncate">
-                  {item.notes}
-                </td>
+                <td className="p-4 max-w-55 truncate">{item.notes}</td>
 
                 <td className="p-4 relative">
                   <div className="flex items-center justify-end gap-3">
-
                     {item.status === "approved" ? (
-                      <button className="flex items-center gap-1 bg-[#E8F8EC] text-[#089624] border border-[#089624] px-3 py-1.5 rounded-xl text-xs">
-                        <Check size={14} />
-                        Approved
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button className="flex items-center gap-1 bg-[#E8F8EC] text-[#089624] border border-[#089624] px-3 py-1.5 rounded-xl text-xs">
+                          <Check size={14} />
+                          Approved
+                        </button>
+
+                        <button
+                          onClick={() => undoStatus(index)}
+                          className="text-xs border px-2 py-1 rounded hover:bg-gray-50"
+                        >
+                          Undo
+                        </button>
+                      </div>
                     ) : item.status === "rejected" ? (
-                      <button className="flex items-center gap-1 bg-[#FFF1EF] text-[#E02600] border border-[#E02600] px-3 py-1.5 rounded-xl text-xs">
-                        <X size={14} />
-                        Rejected
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button className="flex items-center gap-1 bg-[#FFF1EF] text-[#E02600] border border-[#E02600] px-3 py-1.5 rounded-xl text-xs">
+                          <X size={14} />
+                          Rejected
+                        </button>
+
+                        <button
+                          onClick={() => undoStatus(index)}
+                          className="text-xs border px-2 py-1 rounded hover:bg-gray-50"
+                        >
+                          Undo
+                        </button>
+                      </div>
                     ) : (
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => updateStatus(item.id, "rejected")}
+                          onClick={() => updateStatus(index, "rejected")}
                           className="text-red-500 text-xs font-medium px-2 py-1 hover:bg-red-50 rounded"
                         >
                           Reject
                         </button>
 
                         <button
-                          onClick={() => updateStatus(item.id, "approved")}
+                          onClick={() => updateStatus(index, "approved")}
                           className="bg-[#089624] hover:bg-[#06751c] text-white px-3 py-1.5 rounded-xl text-xs"
                         >
                           Approve
@@ -134,7 +152,7 @@ const Table = () => {
 
                     <button
                       onClick={() =>
-                        setOpenMenu(openMenu === item.id ? null : item.id)
+                        setOpenMenuIndex(openMenuIndex === index ? null : index)
                       }
                       className="p-2 border border-[#E5E7EB] rounded-lg hover:bg-gray-50"
                     >
@@ -142,7 +160,7 @@ const Table = () => {
                     </button>
                   </div>
 
-                  {openMenu === item.id && (
+                  {openMenuIndex === index && (
                     <div className="absolute right-0 top-10 w-44 bg-white border border-[#E5E7EB] rounded-xl shadow-lg z-50 overflow-hidden">
                       <button className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50 w-full text-sm">
                         <Pencil size={14} />
@@ -155,7 +173,7 @@ const Table = () => {
                       </button>
 
                       <button
-                        onClick={() => deleteRow(item.id)}
+                        onClick={() => deleteRow(index)}
                         className="flex items-center gap-2 px-4 py-2 hover:bg-red-50 text-red-500 w-full text-sm"
                       >
                         <Trash2 size={14} />
